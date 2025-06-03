@@ -158,12 +158,6 @@
         let operation = null;
         let resetScreen = false;
 
-        // Formateador de números profesional
-        const numberFormatter = new Intl.NumberFormat('en-US', {
-            maximumFractionDigits: 8,
-            useGrouping: true
-        });
-
         // Elementos del DOM
         const display = document.getElementById('display');
         const clearBtn = document.getElementById('clear');
@@ -201,23 +195,8 @@
         });
 
         // Funciones
-        function formatDisplay(numberStr) {
-            try {
-                // Si está en medio de una entrada decimal, no formatear
-                if (numberStr.endsWith('.')) {
-                    return numberStr;
-                }
-                
-                // Convertir a número y formatear
-                const number = parseFloat(numberStr.replace(/,/g, ''));
-                return numberFormatter.format(number);
-            } catch {
-                return numberStr;
-            }
-        }
-
         function updateDisplay() {
-            display.querySelector('span').textContent = formatDisplay(currentValue);
+            display.querySelector('span').textContent = currentValue;
         }
 
         function appendNumber(number) {
@@ -225,9 +204,7 @@
                 currentValue = '';
                 resetScreen = false;
             }
-            
-            // Eliminar comas temporalmente para la entrada
-            currentValue = currentValue.replace(/,/g, '') + number;
+            currentValue += number;
             updateDisplay();
         }
 
@@ -236,7 +213,6 @@
                 currentValue = '0';
                 resetScreen = false;
             }
-            
             if (!currentValue.includes('.')) {
                 currentValue += '.';
                 updateDisplay();
@@ -253,40 +229,30 @@
         }
 
         function toggleSign() {
-            const number = parseFloat(currentValue.replace(/,/g, ''));
-            currentValue = (number * -1).toString();
+            currentValue = (parseFloat(currentValue) * -1).toString();
             updateDisplay();
         }
 
         function percentage() {
-            const number = parseFloat(currentValue.replace(/,/g, ''));
-            currentValue = (number / 100).toString();
+            currentValue = (parseFloat(currentValue) / 100).toString();
             updateDisplay();
         }
 
         function backspace() {
-            // Eliminar comas temporalmente
-            let tempValue = currentValue.replace(/,/g, '');
-            
-            if (tempValue.length === 1 || (tempValue.length === 2 && tempValue.startsWith('-'))) {
+            if (currentValue.length === 1 || (currentValue.length === 2 && currentValue.startsWith('-'))) {
                 currentValue = '0';
             } else {
-                tempValue = tempValue.slice(0, -1);
-                currentValue = tempValue === '' ? '0' : tempValue;
+                currentValue = currentValue.slice(0, -1);
             }
-            
             updateDisplay();
         }
 
         function setOperation(op) {
             if (operation !== null) calculate();
-            
-            // Guardar valor sin comas
-            previousValue = currentValue.replace(/,/g, '');
+            previousValue = currentValue;
             operation = op;
             resetScreen = true;
             
-            // Resaltar operador seleccionado
             operationBtns.forEach(btn => btn.classList.remove('operator-active'));
             event.target.classList.add('operator-active');
         }
@@ -294,7 +260,7 @@
         function calculate() {
             let result;
             const prev = parseFloat(previousValue);
-            const current = parseFloat(currentValue.replace(/,/g, ''));
+            const current = parseFloat(currentValue);
             
             if (isNaN(prev) || isNaN(current)) return;
             
