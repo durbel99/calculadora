@@ -1,10 +1,10 @@
-const CACHE_NAME = 'calculadora-v1';
+const CACHE_NAME = 'calculadora-v3';
 const ASSETS = [
   '/',
   '/index.html',
-  '/styles.css',
-  '/app.js',
-  '/icon.png'
+  '/icon.png',
+  '/icon-192.png',
+  '/icon-512.png'
 ];
 
 self.addEventListener('install', event => {
